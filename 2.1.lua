@@ -628,12 +628,16 @@ lcmds["tphost"].mainfun = function(e) --e.avgs为参数数组,e.uin为输入玩�
         sysMsg("参数个数不正确", e.uin)
         return Err.argsError
     else
-        local ret, x, y, z = Actor:getPosition(hostUin)
-        if (ret == ErrorCode.FAILED) then
-            return Err.codeError
+        if (op.isOp(e.uin) == true) then
+            local ret, x, y, z = Actor:getPosition(hostUin)
+            if (ret == ErrorCode.FAILED) then
+                return Err.codeError
+            end
+            sysMsg("你将被传送到x:" .. x .. ",y:" .. y .. ",z:" .. z, e.uin)
+            Player:setPosition(e.uin, x, y, z)
+        else
+            local req = sendTPrequest(e.uin, hostUin) --发送请求
         end
-        sysMsg("你将被传送到x:" .. x .. ",y:" .. y .. ",z:" .. z, e.uin)
-        Player:setPosition(e.uin, x, y, z)
     end
 end
 lcmds["tphost"].start = function()
@@ -741,7 +745,16 @@ lcmds["tp"].mainfun = function(e) --e.avgs为参数数组,e.uin为输入玩家ui
                 sysMsg("参数个数不正确", e.uin)
                 return Err.argsError
             else
-                local req = sendTPrequest(e.uin, hostUin) --发送请求
+                if (op.isOp(e.uin) == true) then
+                    local ret, x, y, z = Actor:getPosition(hostUin)
+                    if (ret == ErrorCode.FAILED) then
+                        return Err.codeError
+                    end
+                    sysMsg("你将被传送到x:" .. x .. ",y:" .. y .. ",z:" .. z, e.uin)
+                    Player:setPosition(e.uin, x, y, z)
+                else
+                    local req = sendTPrequest(e.uin, hostUin) --发送请求
+                end
             end
         elseif (e.args[1] == "accept") then --接受对方的传送
             local ret, str = Player:getNickname(e.uin)
